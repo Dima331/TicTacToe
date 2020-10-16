@@ -52,17 +52,18 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('ROOM:CORRECT_STATE_X', false);
   })
 
-  socket.on('ROOM:ADD', ({ roomId, board, xIsNext, side }) => {
-    socket.join(roomId);
-    const roomFindQuery = "UPDATE tictac SET steps=? WHERE room=?";
-    db.query(roomFindQuery,
-      [board.toString(), roomId], async (err, data) => {
-      })
-    socket.emit('ROOM:STATE', false);
-    socket.broadcast.emit('ROOM:STATE', true);
+socket.on('ROOM:ADD', ({ roomId, board, xIsNext, side }) => {
+  socket.join(roomId);
+  console.log('here 1')
+  const roomFindQuery = "UPDATE tictac SET steps=? WHERE room=?";
+  db.query(roomFindQuery,
+    [board.toString(), roomId], async (err, data) => {
+    })
     xIsNext = !xIsNext
-    socket.to(roomId).broadcast.emit('ROOM:SET_STEP', { board, xIsNext });
-  })
+    socket.to(roomId).emit('ROOM:STATE', false);
+    socket.to(roomId).broadcast.emit('ROOM:STATE', true);
+  socket.to(roomId).broadcast.emit('ROOM:SET_STEP', { board, xIsNext });
+})
   socket.on('disconnect', () => {
     rooms.forEach((value, roomId) => {
       if (value.get('users').delete(socket.id)) {
