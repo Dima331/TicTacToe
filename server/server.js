@@ -59,9 +59,10 @@ socket.on('ROOM:ADD', ({ roomId, board, xIsNext, side }) => {
   db.query(roomFindQuery,
     [board.toString(), roomId], async (err, data) => {
     })
-    xIsNext = !xIsNext
+    
     socket.to(roomId).emit('ROOM:STATE', false);
     socket.to(roomId).broadcast.emit('ROOM:STATE', true);
+    xIsNext = !xIsNext;
   socket.to(roomId).broadcast.emit('ROOM:SET_STEP', { board, xIsNext });
 })
   socket.on('disconnect', () => {
