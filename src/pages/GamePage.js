@@ -29,6 +29,7 @@ export const GamePage = () => {
   const [stopZero, setStopZero] = useState(false);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+  const [blockStep, setBlockStep] = useState(false);
 
   useEffect(() => {
     if (winner) {
@@ -98,6 +99,7 @@ export const GamePage = () => {
   }
   const stepsHandler = ({ board, xIsNext }) => {
     setXisNext(prev => xIsNext);
+    setBlockStep(prev => false)
     setBoard(board)
   };
 
@@ -106,6 +108,7 @@ export const GamePage = () => {
   }
 
   const handleClick = async i => {
+    // if (blockStep) return
     if (winner || board[i]) return;
     if (side === 'O' && board.indexOf('X') === -1 && board.indexOf('O') === -1) {
       return
@@ -123,6 +126,7 @@ export const GamePage = () => {
     board[i] = side;
     setBoard(prev => board);
     setXisNext(prev => !xIsNext);
+    setBlockStep(prev => true)
     socket.emit('ROOM:ADD', { roomId, board, xIsNext, side });
   }
 
