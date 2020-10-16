@@ -16,22 +16,24 @@ exports.addRoom = (req, res) => {
                 let tagsHaveId = [];
                 for (let val of tags) {
                     if (!val.id) {
-                        tagsNotHaveId.push(val.name);
+                        tagsNotHaveId.push(val.name)
                     } else {
-                        tagsHaveId.push(val.id);
+                        tagsHaveId.push(val.id)
                     }
                 }
+                console.log(tagsNotHaveId)
                 const tagsQuery = "INSERT INTO tags (name) VALUES (?)";
                 for (let i = 0; i < tagsNotHaveId.length; i++) {
                     await new Promise((res, rej) => {
                         db.query(tagsQuery, [tagsNotHaveId[i]], (err, data) => {
                             if (err) return rej(err);
                             res(data);
-                            returnArr.push(data.insertId);
+                            returnArr.push(data.insertId)
                         });
                     });
                 }
-                const tmpQA = [...tagsHaveId, ...returnArr];
+                console.log(idRoom, [...tagsHaveId, ...returnArr])
+                const tmpQA = [...tagsHaveId, ...returnArr]
                 const tagsToGameQuery = "INSERT INTO tictac_to_tags (id_game, id_tag) VALUES (?, ?)";
                 for (let i = 0; i < tmpQA.length; i++) {
                     await new Promise((res, rej) => {
@@ -53,6 +55,7 @@ exports.addRoom = (req, res) => {
 exports.deleteRoom = (req, res) => {
     const { roomId } = req.body;
     const deleteRoomQuery = 'DELETE FROM tictac WHERE room=?';
+    console.log(roomId)
     db.query(deleteRoomQuery, [roomId], (err, data) => {
         if (err) { return res.status(500).send(err); }
         return res.json(data);
@@ -60,24 +63,28 @@ exports.deleteRoom = (req, res) => {
 }
 
 exports.getRooms = (req, res) => {
+    // app.get('/api/rooms', (req, res) => {
     const test = "SELECT tictac.room, tags.name FROM `tictac` INNER JOIN `tictac_to_tags` ON tictac.id=tictac_to_tags.id_game INNER JOIN `tags` ON tags.id=tictac_to_tags.id_tag;";
+    //  "SELECT category.name, orders.name FROM category INNER JOIN orders ON category.category_id=orders.category_id ORDER BY category.name;"
     db.query(test, (err, data) => {
         if (err) { return res.status(500).send(err); }
-        let output = data.reduce(function (item, i) {
-            let occurs = item.reduce(function (n, item, i) {
-                return (item.room === i.room) ? i : n;
+        var output = data.reduce(function (o, cur) {
+            var occurs = o.reduce(function (n, item, i) {
+                return (item.room === cur.room) ? i : n;
             }, -1);
             if (occurs >= 0) {
-                item[occurs].name = item[occurs].name.concat(i.name);
+                o[occurs].name = o[occurs].name.concat(cur.name);
+                // Otherwise,
             } else {
-                let obj = { room: i.room, name: [i.name] };
-                item = item.concat([obj]);
+                var obj = { room: cur.room, name: [cur.name] };
+                o = o.concat([obj]);
             }
-            return item;
+            return o;
         }, []);
         return res.json(output);
     });
 }
+
 exports.checkRooms = (req, res) => {
     const { roomId } = req.body;
     if (!req.body) { return res.status(400).send("No data"); }
@@ -89,7 +96,7 @@ exports.checkRooms = (req, res) => {
             if (err) { return res.status(500).send(err); }
 
             if (!data.length || data.length === 0) {
-                const steps = Array(9).fill(null).toString();
+                const steps = Array(9).fill(null).toString()
                 db.query(setRoomIdQuery,
                     [roomId, steps], (err, data) => {
                         if (err) { return res.status(500).send(err); }
@@ -100,7 +107,6 @@ exports.checkRooms = (req, res) => {
             }
         })
 }
-
 
 exports.searchRooms = (req, res) => {
     const { roomId } = req.body;
