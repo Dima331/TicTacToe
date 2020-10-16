@@ -4,8 +4,8 @@ const app = express();
 const room = require('./routes/rooms.routes');
 const tags = require('./routes/tags.routes');
 const bodyParser = require('body-parser');
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const server = require('http').createServer(app);
+const io = require('socket.io').listen(server);
 const path = require('path');
 // app.use(express.json());
 const buildPath = path.join(__dirname, '..', 'build');
@@ -14,19 +14,7 @@ app.use(bodyParser.json({ 'type': 'application/json' }));
 app.use(bodyParser.urlencoded({ 'extended': true }));
 app.use('/api/rooms', room);
 app.use('/api/tags', tags);
-const PORT = process.env.PORT || 5000;
-
-app.get('*', function (request, response){
-  response.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'))
-})
-
-//const PORT = process.env.PORT || 5000;
-
-// app.use(bodyParser.json({ 'type': 'application/json' }));
-// app.use(bodyParser.urlencoded({ 'extended': true }));
-// const PORT = config.get('port') || 5000;
-// const rooms = require('./routes/rooms.routes');
-// app.use('/api/rooms', rooms);
+const PORT = process.env.PORT || 3000;
 
 let rooms = new Map;
 
@@ -50,9 +38,7 @@ io.on('connection', (socket) => {
         socket.emit('ROOM:SET_SIDE', 'X');
       } else if (rooms.get(roomId).get('users').size === 1) {
         const users = [...rooms.get(roomId).get('users')];
-        if (users[0][1] == 'O') {
-          rooms.get(roomId).get('users').set(socket.id, 'X');
-          socket.emit('ROOM:SET_SIDE', 'X');
+        if (users[0][1] == 'O') {          socket.emit('ROOM:SET_SIDE', 'X');
         } else {
           rooms.get(roomId).get('users').set(socket.id, 'O');
           socket.emit('ROOM:SET_SIDE', 'O');
@@ -88,6 +74,20 @@ io.on('connection', (socket) => {
 
 });
 
+app.get('*', function (request, response){
+  response.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'))
+})
+
+//const PORT = process.env.PORT || 5000;
+
+// app.use(bodyParser.json({ 'type': 'application/json' }));
+// app.use(bodyParser.urlencoded({ 'extended': true }));
+// const PORT = config.get('port') || 5000;
+// const rooms = require('./routes/rooms.routes');
+// app.use('/api/rooms', rooms);
+
+
+
 const db = mysql.createPool({
   connectionLimit : 30,
   host: "eu-cdbr-west-03.cleardb.net",
@@ -98,4 +98,4 @@ const db = mysql.createPool({
 
 global.db = db;
 
-app.listen(PORT, () => console.log(`here port ${PORT}`));
+server.listen(process.env.PORT || 3000);
