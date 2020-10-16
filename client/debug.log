@@ -1,0 +1,4 @@
+[1014/083430.183:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)
+[1014/083430.218:ERROR:filesystem_win.cc(129)] GetFileAttributes C:\Users\Barkov_D\AppData\Local\Google\Chrome\User Data\Crashpad\attachments\1f848b13-26a2-46a1-ad6e-774ca790a0d0: Системе не удается найти указанный путь. (0x3)
+[1015/084511.509:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)
+[1016/090212.324:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)

@@ -16,7 +16,8 @@
     "react-draft-wysiwyg": "1.14.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "react-tag-autocomplete": "^6.1.0"
+    "react-tag-autocomplete": "^6.1.0",
+    "socket.io-client": "^2.3.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -27,7 +28,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:9090",
   "browserslist": {
     "production": [
       ">0.2%",
