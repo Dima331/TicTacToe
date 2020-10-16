@@ -1,11 +1,26 @@
 const express = require('express');
 const mysql = require("mysql2");
 const app = express();
-
-// const server = app.listen(5000)
+const room = require('./routes/rooms.routes');
+const tags = require('./routes/tags.routes');
+const bodyParser = require('body-parser');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-app.use(express.json());
+const path = require('path');
+// app.use(express.json());
+const buildPath = path.join(__dirname, '..', 'build');
+app.use(express.static(buildPath));
+app.use(bodyParser.json({ 'type': 'application/json' }));
+app.use(bodyParser.urlencoded({ 'extended': true }));
+app.use('/api/rooms', room);
+app.use('/api/tags', tags);
+const PORT = process.env.PORT || 5000;
+
+app.get('*', function (request, response){
+  response.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'))
+})
+
+//const PORT = process.env.PORT || 5000;
 
 // app.use(bodyParser.json({ 'type': 'application/json' }));
 // app.use(bodyParser.urlencoded({ 'extended': true }));
@@ -13,26 +28,8 @@ app.use(express.json());
 // const rooms = require('./routes/rooms.routes');
 // app.use('/api/rooms', rooms);
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  database: "manager",
-  password: "root"
-});
-
-db.connect((err) => {
-  if (err) { throw err; }
-  console.log('Connected to database');
-});
-
-global.db = db;
 let rooms = new Map;
 
-const room = require('./routes/rooms.routes');
-const tags = require('./routes/tags.routes');
-
-app.use('/api/rooms', room);
-app.use('/api/tags', tags);
 
 io.on('connection', (socket) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>connected')
@@ -91,10 +88,14 @@ io.on('connection', (socket) => {
 
 });
 
-// app.listen(PORT, () => console.log(`here port ${PORT}`));
-server.listen(9090, (err) => {
-  if (err) {
-    throw Error(err);
-  }
-  console.log('Сервер запущен!');
+const db = mysql.createPool({
+  connectionLimit : 30,
+  host: "eu-cdbr-west-03.cleardb.net",
+  user: "b7d5fcc0dab453",
+  database: "heroku_834f816ce945ec4",
+  password: "fc773d3c"
 });
+
+global.db = db;
+
+app.listen(PORT, () => console.log(`here port ${PORT}`));
