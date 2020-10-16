@@ -108,7 +108,6 @@ export const GamePage = () => {
   }
 
   const handleClick = async i => {
-    // if (blockStep) return
     if (winner || board[i]) return;
     if (side === 'O' && board.indexOf('X') === -1 && board.indexOf('O') === -1) {
       return
@@ -122,7 +121,12 @@ export const GamePage = () => {
     if (!move) {
       return
     }
-
+    if(side === 'X' && !xIsNext){
+      return 
+    }
+    if(side === 'O' && xIsNext){
+      return 
+    }
     board[i] = side;
     setBoard(prev => board);
     setXisNext(prev => !xIsNext);
